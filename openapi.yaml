@@ -1,0 +1,107 @@
+openapi: "3.0.0"
+info:
+  title: "Customer API"
+  version: "1.0.0"
+paths:
+  /customers:
+    post:
+      summary: "Create a new customer"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Name of the customer."
+                email:
+                  type: string
+                  format: email
+                  description: "Email of the customer."
+                website:
+                  type: string
+                  format: uri
+                  description: "Website of the customer."
+                businessId:
+                  type: string
+                  description: "Business ID of the customer."
+              required:
+                - name
+      responses:
+        '201':
+          description: "Customer successfully created."
+        '400':
+          description: "Invalid input, object invalid."
+        '500':
+          description: "Unexpected error."
+    get:
+      summary: "Get a list of customers"
+      responses:
+        '200':
+          description: "A JSON array of customers"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+        '500':
+          description: "Unexpected error."
+  /customers/{customerId}:
+    get:
+      summary: "Get a customer by ID"
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: "A customer object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        '404':
+          description: "Customer not found."
+        '500':
+          description: "Unexpected error."
+    delete:
+      summary: "Delete a customer by ID"
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: "Customer successfully deleted."
+        '404':
+          description: "Customer not found."
+        '500':
+          description: "Unexpected error."
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        website:
+          type: string
+          format: uri
+        businessId:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
