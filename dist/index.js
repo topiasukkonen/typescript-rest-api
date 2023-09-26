@@ -14,14 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_validator_1 = require("express-validator");
+const axios_1 = __importDefault(require("axios"));
 const sqlite3_1 = __importDefault(require("sqlite3"));
-// Initialize express and sqlite
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const db = new sqlite3_1.default.Database(':memory:');
-// Create customers table
+// Create db table
 db.run('CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, email TEXT, website TEXT, businessId TEXT, address TEXT, phone TEXT)');
-// Define routes
+// Defined routes
 app.post('/customers', [
     (0, express_validator_1.body)('name').isString(),
     (0, express_validator_1.body)('email').optional().isEmail(),
@@ -37,17 +37,16 @@ app.post('/customers', [
     let phone = '';
     if (businessId) {
         try {
-            // Workaround: Commenting out the API call and manually setting the address and phone
-            // const response = await axios.get(`https://www.kauppalehti.fi/company-api/basic-info/${businessId}`);
-            // address = response.data.streetAddress;
-            // phone = '+358' + response.data.phone;
-            address = 'Test Address';
-            phone = '+3581234567';
+            const response = yield axios_1.default.get(`https://www.kauppalehti.fi/company-api/basic-info/${businessId}`);
+            address = response.data.data.streetAddress;
+            phone = '+358' + response.data.data.phone;
         }
         catch (error) {
-            console.error(error); // Log the error for debugging
+            console.error(error);
             return res.status(400).json({ error: 'Invalid businessId' });
         }
+        address = 'Test Address';
+        phone = '+3581234567';
     }
     db.run('INSERT INTO customers (name, email, website, businessId, address, phone) VALUES (?, ?, ?, ?, ?, ?)', [name, email, website, businessId, address, phone]);
     res.status(201).send();
@@ -84,6 +83,5 @@ app.delete('/customers/:id', (req, res) => {
         res.status(204).send();
     });
 });
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));

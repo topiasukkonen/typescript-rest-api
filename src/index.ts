@@ -29,14 +29,18 @@ app.post('/customers', [
   let phone = '';
 
   if (businessId) {
-    try {
-      // const response = await axios.get(`https://www.kauppalehti.fi/company-api/basic-info/${businessId}`);
-      address = 'Test Address';
-      phone = '+3581234567';
-    } catch (error) {
-      console.error(error);
-      return res.status(400).json({ error: 'Invalid businessId' });
-    }
+    // try {
+    //   const response = await axios.get(`https://www.kauppalehti.fi/company-api/basic-info/${businessId}`);
+    //   address = response.data.data.streetAddress;
+    //   phone = '+358' + response.data.data.phone;
+    // } catch (error) {
+    //   console.error(error);
+    //   return res.status(400).json({ error: 'Invalid businessId' });
+    // }
+  
+    // Mock as API not found (?)
+    address = 'Test Address';
+    phone = '+3581234567';
   }
 
   db.run('INSERT INTO customers (name, email, website, businessId, address, phone) VALUES (?, ?, ?, ?, ?, ?)', [name, email, website, businessId, address, phone]);
